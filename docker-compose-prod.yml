@@ -1,0 +1,21 @@
+version: "3.8"
+
+services:
+
+  admin:
+    restart: always
+    build:
+      context: ./admin
+      dockerfile: Dockerfile
+      args:
+        - ADMIN_PORT=${ADMIN_PORT}
+        - ADMIN_ENDPOINT=${ADMIN_ENDPOINT}
+        - ADMIN_ENDPOINT_WS=${ADMIN_ENDPOINT_WS}
+        - ADMIN_AUTH_VK_URL=${ADMIN_AUTH_VK_URL}
+    ports:
+      - ${ADMIN_PORT}:${ADMIN_PORT}
+    environment:
+      - ADMIN_PORT
+      - ADMIN_ENDPOINT
+      - ADMIN_ENDPOINT_WS
+      - ADMIN_AUTH_VK_URL

@@ -1,0 +1,10 @@
+{
+  "name": "projectx",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "docker-compose --env-file dev.env -f docker-compose-dev.yml up --build -d",
+    "prod": "docker-compose --env-file prod.env -f docker-compose-prod.yml up --build -d",
+    "ngrok": "ngrok http 80"
+  }
+}

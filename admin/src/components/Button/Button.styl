@@ -1,0 +1,41 @@
+.Button
+  display inline-flex
+  padding 0.2em 1em
+  margin 0.5em
+  user-select none
+  cursor pointer
+  color white
+  border-radius 0.7em
+  justify-content center
+  align-items center
+  flex-shrink 0
+  background-color rgba(#4E6FD9, 0.3)
+  border 0.15em solid #4E6FD8
+  box-shadow 0 0 1em rgba(#4E6FD8, 0.4)
+
+  & + &
+    margin-left 0.5em
+
+  &:hover
+    background-color rgba(#4E6FD8, 0.4)
+    box-shadow 0 0 1em rgba(#4E6FD8, 0.4)
+
+  &.__red
+    background-color rgba(#dc3912, 0.2)
+    border 0.15em solid #dc3912
+    box-shadow 0 0 1em rgba(#dc3912, 0.4)
+
+    &:hover
+      background-color rgba(#dc3912, 0.4)
+      box-shadow 0 0 1em rgba(#dc3912, 0.4)
+
+  &.__green
+    background-color rgba(yellowgreen, 0.2)
+    border 0.15em solid yellowgreen
+    box-shadow 0 0 1em rgba(yellowgreen, 0.4)
+
+    &:hover
+      background-color rgba(yellowgreen, 0.4)
+      box-shadow 0 0 1em rgba(yellowgreen, 0.4)
+
+

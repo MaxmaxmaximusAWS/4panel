@@ -1,0 +1,521 @@
+# Exposes a URL that specifies the behaviour of this scalar.
+directive @specifiedBy(
+  # The URL that specifies the behaviour of this scalar.
+  url: String!
+) on SCALAR
+type ActiveGame {
+  createdAt: String!
+  updatedAt: String!
+  gameMode: GameMode!
+  active: Boolean!
+}
+
+type AdminUser {
+  createdAt: String!
+  updatedAt: String!
+  id: String
+  username: String!
+  role: Roles!
+  permissions: [Permissions!]
+}
+
+type AuthTokenResponse {
+  accessToken: String!
+  refreshToken: String!
+}
+
+type BaseResponse {
+  type: String!
+  errMsg: String
+}
+
+type BlackListWords {
+  wordsCount: Float!
+  words: [String!]!
+}
+
+type Bonus {
+  createdAt: String!
+  updatedAt: String!
+  id: String!
+  userId: String!
+  amount: Float!
+}
+
+type DashboardInfo {
+  deposits: Float!
+  withdraws: Float!
+  promotions: Float!
+  bonuses: Float!
+  referrals: Float!
+  gifts: Float!
+  commissions: Float!
+  ngr: Float!
+  gamesRevenue: [GamesRevenue!]!
+}
+
+# A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+scalar DateTime
+
+union DicesGameResponse = GameState | BaseResponse
+type DoubleGameBetEvent {
+  username: String!
+  userAvatar: String!
+  coefficient: Float!
+  betAmount: Float!
+}
+
+union DoubleGameEvents = DoubleGameStateEvent | DoubleGameBetEvent
+type DoubleGameStateEvent {
+  gameState: GameTransition!
+  acceptingBetsFrame: Float
+  coefficientWin: Float
+  fieldWin: Float
+}
+
+enum EqualityOption {
+  GREATER
+  LESS
+}
+
+type FilteredUsers {
+  count: Float!
+  users: [User]!
+}
+
+type FilteredWithdraw {
+  count: Float!
+  withdraws: [Withdraw]!
+}
+
+type GameInfo {
+  name: String!
+}
+
+enum GameMode {
+  CRASH
+  DICES
+  MINES
+  DOUBLE
+}
+
+type GameResult {
+  createdAt: String!
+  updatedAt: String!
+  id: Float
+  gameMode: GameMode!
+  userId: String
+  username: String!
+  userAvatar: String
+  betAmount: Float!
+  coefficient: Float!
+  result: Float!
+  win: Boolean!
+  timestamp: String!
+}
+
+type GameRTP {
+  createdAt: String!
+  updatedAt: String!
+  gameMode: GameMode!
+  rtp: Float!
+}
+
+type GamesRevenue {
+  gameMode: GameMode!
+  betsQty: Float!
+  betsAmount: Float!
+  winsAmount: Float!
+  looseAmount: Float!
+  ggr: Float!
+}
+
+type GameState {
+  userId: String
+  crashed: Boolean!
+  result: Float!
+  coefficient: Float!
+  currentFrame: Float!
+  maxCoefficient: Float
+  possibleResults: [Float!]
+}
+
+enum GameTransition {
+  PREPARE
+  ACCEPTING_BETS
+  RUNNING
+  GAME_END
+}
+
+type MessageEntry {
+  id: String!
+  text: String!
+  visible: Boolean!
+  date: String!
+  sender: User!
+}
+
+# show current game state
+type MinesGameCurrentState {
+  # initial bet amount at game start
+  betAmount: Float!
+  # mines count that user choose at game start
+  minesCount: Float!
+  # already moved at game board
+  moves: [Float!]!
+  # current win amount
+  result: Float!
+  # current win coefficient
+  coefficient: Float!
+}
+
+type Mutation {
+  oneClickLogin(username: String!, password: String!): AuthTokenResponse!
+  refreshToken(token: String!): AuthTokenResponse!
+  forgotPassword(email: String!): String!
+  oneClickRegister(
+    refCode: String
+    username: String!
+    recaptcha: String!
+  ): OneClickRegisterResponse!
+  changePrivacySettings(
+    isAnonymous: Boolean
+    hideProfile: Boolean
+    hideBetsSum: Boolean
+  ): User!
+  changeUserName(username: String!): User!
+  changePhone(mobilePhone: String!): User!
+  changeEmail(email: String!): String!
+  changeReferralLink(newLink: String!): User!
+  # login as admin user
+  adminLogin(username: String!, password: String!): AuthTokenResponse!
+  # (superuser only) create admin user
+  createAdminUser(
+    username: String!
+    password: String!
+    role: Roles
+    permissions: [Permissions!]
+  ): AdminUser!
+  # (superuser only) update admin user
+  updateAdminUser(
+    id: String!
+    username: String
+    password: String
+    role: Roles
+    permissions: [Permissions!]
+  ): AdminUser!
+  createPromocode(
+    amount: Float!
+    activationCount: Float!
+    timeoutSec: Float!
+    code: String!
+  ): Promocode!
+  muteUserInChat(userId: String!, time: Float): Boolean!
+  addBlackListWord(word: String!): String!
+  removeBlackListWord(word: String!): String!
+  setGameActiveStatus: ActiveGame!
+  setGameRTP(gameMode: GameMode!, rtp: Float!): GameRTP!
+  # (admin only) send notification to users, if receivers is empty send to all
+  sendNotification(
+    # to users, if empty send to all
+    receivers: [String!]
+    # sender
+    from: String!
+    message: String!
+  ): Boolean!
+  acceptWithdraw(id: String!): Boolean!
+  deniWithdraw(id: String!, reason: String!): Boolean!
+  rollSlot: Float!
+  activatePromocode(promocode: String!): Boolean!
+  sendMessageToChat(text: String!): MessageEntry!
+  deleteChatMessage(messageId: String!): Boolean!
+  playCrashGame(
+    amount: Float!
+    # used for specific games
+    autoStop: Float
+    # used for specific games
+    equality: EqualityOption = LESS
+    # used for specific games
+    desiredNumber: Float
+  ): BaseResponse!
+  stopCrashGame: BaseResponse
+  playDicesGame(
+    amount: Float!
+    # used for specific games
+    autoStop: Float
+    # used for specific games
+    equality: EqualityOption = LESS
+    # used for specific games
+    desiredNumber: Float
+  ): DicesGameResponse!
+  playDoubleGame(
+    amount: Float!
+    # used for specific games
+    autoStop: Float
+    # used for specific games
+    equality: EqualityOption = LESS
+    # used for specific games
+    desiredNumber: Float
+  ): BaseResponse!
+  # start mines game with choosing mines count
+  playMinesGame(
+    amount: Float!
+    # used for specific games
+    autoStop: Float
+    # used for specific games
+    equality: EqualityOption = LESS
+    # used for specific games
+    desiredNumber: Float
+  ): BaseResponse!
+  # grab money at current state and current coefficient
+  stopMinesGame: BaseResponse
+  # make next mines move (to moveTo tile) at board
+  moveMinesGame(moveTo: Float!): BaseResponse
+  tryToWithdrawReferralBonus: Boolean!
+  withdrawRequest(amount: Float!): Boolean!
+}
+
+type Notification {
+  # to users, if empty send to all
+  receivers: [String!]
+  # sender
+  from: String!
+  message: String!
+}
+
+type NotificationsHistory {
+  createdAt: String!
+  updatedAt: String!
+  id: Float!
+  from: String!
+  message: String!
+}
+
+type OneClickRegisterResponse {
+  username: String!
+  password: String!
+  passwordToken: String!
+  accessToken: String!
+  refreshToken: String!
+}
+
+type PartialUserInfo {
+  id: String!
+  username: String!
+  img: String!
+  role: Roles!
+}
+
+enum Permissions {
+  DASHBOARD_ADMINISTRATION
+  CHAT_ADMINISTRATION
+  BONUS_ADMINISTRATION
+  USERS_ADMINISTRATION
+  WITHDRAW_ADMINISTRATION
+  GAMES_ADMINISTRATION
+}
+
+type Promocode {
+  createdAt: String!
+  updatedAt: String!
+  code: String!
+  amount: Float!
+  activationCounter: Float!
+  activationLimit: Float!
+  expire: String!
+}
+
+type PromocodeHistory {
+  createdAt: String!
+  updatedAt: String!
+  userId: String!
+  reference: Promocode!
+}
+
+type Query {
+  getMyNotifications: [NotificationsHistory!]
+  getOnlineUsersCount: Float!
+  getUser(id: String!): PartialUserInfo!
+  getMyProfile: User!
+  # get admin user profile info
+  getAdminProfile: AdminUser!
+  # (superuser only) get admin users list
+  getAllAdminUsers: [AdminUser!]!
+  getUsersLTV(userIds: [String!]): [UserLTV!]!
+  getPromocodes(userId: String, start: String, end: String): [Promocode!]
+  getPromocodesHistory(
+    userId: String
+    start: String
+    end: String
+  ): [PromocodeHistory!]
+  getBonusesHistoryByAdmin(userId: String, start: String, end: String): [Bonus!]
+  getBlackListWords(from: Float = 0, to: Float = 10): BlackListWords!
+  setChatAsDisabled(disable: Boolean!): String!
+  getDashboardInfo(dateFrom: DateTime, dateTo: DateTime): DashboardInfo!
+  getActiveGames: [ActiveGame!]!
+  getGamesRtp(gameMode: [GameMode!]): [GameRTP!]!
+  # (admin only) find account users by provided params
+  findUsers(
+    registeredFrom: DateTime
+    registeredTo: DateTime
+    deposited: Boolean
+  ): FilteredUsers!
+  # (admin only) get account user info
+  getUserInfo(userId: String!): UserInfo!
+  # (admin only) get account user (with userId) game history by provided params
+  getUserGamesHistory(
+    userId: String!
+    dateFrom: DateTime
+    dateTo: DateTime
+    gameMode: GameMode
+  ): UserGamesHistory!
+  getWithdraws(
+    dateFrom: DateTime
+    dateTo: DateTime
+    userId: String
+    accepted: Boolean
+    denied: Boolean
+  ): FilteredWithdraw!
+  rollBonusPossibility: RollSlotPossibility!
+  lastBonusRoll: Bonus
+  getBonusHistory(to: String!, from: String!): [Bonus!]
+  getChatMessages(
+    start: Float!
+    stop: Float!
+    limit: Float = 20
+  ): [MessageEntry!]
+  crashGameInfo: GameInfo!
+  # get mines game current state if already in game
+  getMinesGameCurrentState: MinesGameCurrentState!
+  getGameHistory(
+    game: GameMode
+    limit: Float
+    dateFrom: DateTime
+    dateTo: DateTime
+  ): [GameResult!]
+  getMyGameHistory(
+    game: GameMode
+    limit: Float
+    dateFrom: DateTime
+    dateTo: DateTime
+  ): [GameResult!]
+  getReferralBonusBalance: Float!
+}
+
+type Referral {
+  id: String!
+  referralAllAmount: Float!
+  referralTransitions: Float!
+  referralRegistrations: Float!
+  link: String!
+}
+
+enum Roles {
+  USER
+  ADMINISTRATOR
+  SUPERUSER
+  BANNED
+}
+
+type RollSlotPossibility {
+  canRoll: Boolean!
+  lastBonus: Bonus
+  errMsg: String
+}
+
+type Subscription {
+  # subscription for admin/system notifications
+  subscribeForNotifications: Notification!
+  currentUsersOnlineCount: Float!
+  commentAdded: MessageEntry!
+  commentDeleted: String!
+  crashgame: GameState!
+  subscribeForDoubleGameEvents: DoubleGameEvents!
+  doublegame: GameState!
+  # subscribe for mines game state changes
+  minesgame: GameState!
+  getGameLastResults(
+    game: GameMode
+    limit: Float
+    dateFrom: DateTime
+    dateTo: DateTime
+  ): GameResult!
+  getMyGameLastResults(
+    game: GameMode
+    limit: Float
+    dateFrom: DateTime
+    dateTo: DateTime
+  ): GameResult!
+  subscribeForBalanceChanges: UserBalance!
+}
+
+type User {
+  createdAt: String!
+  updatedAt: String!
+  id: String!
+  username: String
+  email: String
+  referral: Referral!
+  img: String
+  isAnonymous: Boolean
+  hideProfile: Boolean
+  hideBetsSum: Boolean
+  mobilePhone: String
+  role: Roles!
+  balance: Float!
+  experience: Float!
+  bonusLvl: Float!
+}
+
+type UserBalance {
+  userId: String!
+  currentBalance: Float!
+}
+
+type UserGameInfo {
+  gameMode: GameMode!
+  betsAmount: Float!
+  winsAmount: Float!
+}
+
+type UserGamesHistory {
+  count: Float!
+  history: [GameResult]!
+}
+
+type UserInfo {
+  userId: String!
+  balanceReal: Float!
+  balanceBonus: Float!
+  promocodes: Float!
+  bonusSlot: Float!
+  moneyRain: Float!
+  chatPrises: Float!
+  depositCount: Float!
+  depositAmount: Float!
+  withdrawsCount: Float!
+  withdrawsAmount: Float!
+  referralWithdrawCount: Float!
+  referralWithdrawAmount: Float!
+  ngr: Float!
+  betsAmount: Float!
+  depositWagering: Float!
+  gamesInfo: [UserGameInfo!]!
+}
+
+type UserLTV {
+  userId: String!
+  amount: Float!
+}
+
+type Withdraw {
+  createdAt: String!
+  updatedAt: String!
+  id: String!
+  userId: String!
+  amount: Float!
+  accepted: Boolean!
+  denied: Boolean!
+  reason: String
+}
+

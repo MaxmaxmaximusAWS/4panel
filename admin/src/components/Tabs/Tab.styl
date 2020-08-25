@@ -1,0 +1,27 @@
+.Tab
+  $time = 0.3s
+  absolute top left
+  opacity 0
+  size 100%
+  padding 1em
+  transition opacity $time, transform $time
+  text-align center
+  display flex
+  flex-direction column
+  justify-content center
+  align-items center
+
+  &.__prev
+    pointer-events none
+    transform translateX(-20%)
+
+  &.__next
+    pointer-events none
+    transform translateX(20%)
+
+  &.__active
+    opacity 1
+    z-index 1
+    position relative
+
+

@@ -1,0 +1,30 @@
+.notification
+  background-color blue
+  position relative
+  display flex
+  flex-direction row
+  transition opacity 0.2s
+  cursor pointer
+  opacity 0.8
+  margin 0.25em 0.5em
+  border-radius 0.25em
+  background-image linear-gradient(transparent, rgba(black, 0.1))
+
+  &:hover
+    opacity 1
+
+  &.__error
+    background-color #ff541b
+
+  &.__alert
+    background-color #1a7bff
+    color white
+
+  .message
+    padding 1em
+    display flex
+    flex-direction row
+    align-items center
+    justify-content center
+
+
